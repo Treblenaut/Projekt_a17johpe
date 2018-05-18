@@ -9,11 +9,14 @@ import android.provider.BaseColumns;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +34,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private List<MarvelCharacter> characterData = new ArrayList<>();
     MarvelReaderDbHelper dbHelper;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +46,17 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         new FetchData().execute();
 
+        mRecyclerView = (RecyclerView) findViewById(R.id.my_recyclerview);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new CustomAdapter(characterData, new CustomAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(MarvelCharacter item) {
+                Toast.makeText(getApplicationContext(), item.getInfo(), Toast.LENGTH_LONG).show();
+            }
+        });
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        mRecyclerView.setAdapter(mAdapter);
 
         dbHelper = new MarvelReaderDbHelper(getApplicationContext());
         rereadFromDatabase();
@@ -76,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void rereadFromDatabase() {
+        characterData.clear();
         SQLiteDatabase dbRead = dbHelper.getReadableDatabase();
 
         String[] projection = {
@@ -113,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
             String mImage = cursor.getString(cursor.getColumnIndexOrThrow(MarvelReaderContract.MarvelEntry.COLUMN_NAME_IMAGE));
 
             MarvelCharacter m = new MarvelCharacter(mName, mTeam, mFirst, mHome, mHero, mActor, mWiki, mImage);
+            characterData.add(m);
         }
         cursor.close();
     }
@@ -188,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
             // of our newly created Mountain class.
             try {
                 JSONArray json1 = new JSONArray(o);
+                mRecyclerView.setAdapter(null);
 
                 SQLiteDatabase dbWrite = dbHelper.getWritableDatabase();
                 //mRecyclerView.setAdapter(null);
@@ -217,23 +238,12 @@ public class MainActivity extends AppCompatActivity {
 
                     dbWrite.insert(MarvelReaderContract.MarvelEntry.TABLE_NAME, null, values);
 
-                    /*
-                    mountainData.add(m);
-                    mRecyclerView.setAdapter(new MountainAdapter(mountainData, new MountainAdapter.OnItemClickListener() {
-                        @Override public void onItemClick(Mountain item) {
-                            Intent intent = new Intent(getApplicationContext(), Details.class);
-                            //Toast.makeText(getApplicationContext(), item.info(), Toast.LENGTH_LONG).show();
-
-                            String nameInfo = item.nameInfo();
-                            String locationInfo = item.locationInfo();
-                            String heightInfo = item.heightInfo();
-                            intent.putExtra("Name", nameInfo);
-                            intent.putExtra("Location", locationInfo);
-                            intent.putExtra("Height", heightInfo);
-                            intent.putExtra("Image", item.imageUrl());
-                            startActivity(intent);
+                    mRecyclerView.setAdapter(new CustomAdapter(characterData, new CustomAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(MarvelCharacter item) {
+                            Toast.makeText(getApplicationContext(), item.getInfo(), Toast.LENGTH_LONG).show();
                         }
-                    }));*/
+                    }));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

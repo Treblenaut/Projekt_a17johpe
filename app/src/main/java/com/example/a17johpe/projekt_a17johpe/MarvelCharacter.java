@@ -35,6 +35,14 @@ public class MarvelCharacter {
         return name;
     }
 
+    public String getHeroName() {
+        return heroName;
+    }
+
+    public String getTeam() {
+        return team;
+    }
+
     public String getInfo() {
         String str = name + " " + team + " " + firstAppearance + " " + homeLocation + " " + heroName + " " + actor + " " + wikipage + " " + image;
         return str;
