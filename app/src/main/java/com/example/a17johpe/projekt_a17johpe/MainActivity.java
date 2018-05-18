@@ -1,7 +1,11 @@
 package com.example.a17johpe.projekt_a17johpe;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -21,8 +25,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private List<MarvelCharacter> characterData = new ArrayList<>();
+    MarvelReaderDbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        dbHelper = new MarvelReaderDbHelper(getApplicationContext());
+        rereadFromDatabase();
     }
 
     @Override
@@ -62,6 +73,48 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void rereadFromDatabase() {
+        SQLiteDatabase dbRead = dbHelper.getReadableDatabase();
+
+        String[] projection = {
+                BaseColumns._ID,
+                MarvelReaderContract.MarvelEntry.COLUMN_NAME_NAME,
+                MarvelReaderContract.MarvelEntry.COLUMN_NAME_HERO,
+                MarvelReaderContract.MarvelEntry.COLUMN_NAME_ACTOR,
+                MarvelReaderContract.MarvelEntry.COLUMN_NAME_FIRST,
+                MarvelReaderContract.MarvelEntry.COLUMN_NAME_TEAM,
+                MarvelReaderContract.MarvelEntry.COLUMN_NAME_HOME,
+                MarvelReaderContract.MarvelEntry.COLUMN_NAME_WIKI,
+                MarvelReaderContract.MarvelEntry.COLUMN_NAME_IMAGE
+        };
+
+        String sortOrder = MarvelReaderContract.MarvelEntry.COLUMN_NAME_NAME + " ASC";
+
+        Cursor cursor = dbRead.query(
+                MarvelReaderContract.MarvelEntry.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+
+        while (cursor.moveToNext()) {
+            String mName = cursor.getString(cursor.getColumnIndexOrThrow(MarvelReaderContract.MarvelEntry.COLUMN_NAME_NAME));
+            String mHero = cursor.getString(cursor.getColumnIndexOrThrow(MarvelReaderContract.MarvelEntry.COLUMN_NAME_HERO));
+            String mActor = cursor.getString(cursor.getColumnIndexOrThrow(MarvelReaderContract.MarvelEntry.COLUMN_NAME_ACTOR));
+            String mFirst = cursor.getString(cursor.getColumnIndexOrThrow(MarvelReaderContract.MarvelEntry.COLUMN_NAME_FIRST));
+            String mTeam = cursor.getString(cursor.getColumnIndexOrThrow(MarvelReaderContract.MarvelEntry.COLUMN_NAME_TEAM));
+            String mHome = cursor.getString(cursor.getColumnIndexOrThrow(MarvelReaderContract.MarvelEntry.COLUMN_NAME_HOME));
+            String mWiki = cursor.getString(cursor.getColumnIndexOrThrow(MarvelReaderContract.MarvelEntry.COLUMN_NAME_WIKI));
+            String mImage = cursor.getString(cursor.getColumnIndexOrThrow(MarvelReaderContract.MarvelEntry.COLUMN_NAME_IMAGE));
+
+            MarvelCharacter m = new MarvelCharacter(mName, mTeam, mFirst, mHome, mHero, mActor, mWiki, mImage);
+        }
+        cursor.close();
     }
 
     private class FetchData extends AsyncTask<Void,Void,String> {
@@ -135,31 +188,36 @@ public class MainActivity extends AppCompatActivity {
             // of our newly created Mountain class.
             try {
                 JSONArray json1 = new JSONArray(o);
+
+                SQLiteDatabase dbWrite = dbHelper.getWritableDatabase();
                 //mRecyclerView.setAdapter(null);
                 //mountainData.clear();
 
                 for (int i = 0; i < json1.length(); i++) {
                     JSONObject marvel = json1.getJSONObject(i);
-                    int marvelId = marvel.getInt("ID");
                     String marvelName = marvel.getString("name");
-                    //String elevKod = marvel.getString("type");
                     String marvelTeam = marvel.getString("company");
                     String marvelLocation = marvel.getString("location");
                     String marvelFirst = marvel.getString("category");
-                    //int mountainSize = marvel.getInt("size");
-                    //int mountainCost = marvel.getInt("cost");
                     JSONObject marvelAuxdata = new JSONObject(marvel.getString("auxdata"));
                     String marvelHero = marvelAuxdata.getString("supername");
                     String marvelActor = marvelAuxdata.getString("actor");
                     String marvelWiki = marvelAuxdata.getString("wiki");
                     String marvelImage = marvelAuxdata.getString("image");
 
-                    MarvelCharacter m = new MarvelCharacter(marvelName, marvelTeam, marvelFirst, marvelLocation,
-                            marvelHero, marvelActor, marvelWiki, marvelImage);
-                    Log.d("olle1", marvel.toString());
+                    ContentValues values = new ContentValues();
+                    values.put(MarvelReaderContract.MarvelEntry.COLUMN_NAME_NAME, marvelName);
+                    values.put(MarvelReaderContract.MarvelEntry.COLUMN_NAME_TEAM, marvelTeam);
+                    values.put(MarvelReaderContract.MarvelEntry.COLUMN_NAME_HOME, marvelLocation);
+                    values.put(MarvelReaderContract.MarvelEntry.COLUMN_NAME_FIRST, marvelFirst);
+                    values.put(MarvelReaderContract.MarvelEntry.COLUMN_NAME_HERO, marvelHero);
+                    values.put(MarvelReaderContract.MarvelEntry.COLUMN_NAME_ACTOR, marvelActor);
+                    values.put(MarvelReaderContract.MarvelEntry.COLUMN_NAME_WIKI, marvelWiki);
+                    values.put(MarvelReaderContract.MarvelEntry.COLUMN_NAME_IMAGE, marvelImage);
 
-                    /*Mountain m = new Mountain(mountainId, mountainName, mountainType, mountainCompany,
-                            mountainLocation, mountainCategory, mountainSize, mountainCost, mountainImg, mountainUrl);
+                    dbWrite.insert(MarvelReaderContract.MarvelEntry.TABLE_NAME, null, values);
+
+                    /*
                     mountainData.add(m);
                     mRecyclerView.setAdapter(new MountainAdapter(mountainData, new MountainAdapter.OnItemClickListener() {
                         @Override public void onItemClick(Mountain item) {
@@ -181,5 +239,11 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        dbHelper.close();
+        super.onDestroy();
     }
 }
