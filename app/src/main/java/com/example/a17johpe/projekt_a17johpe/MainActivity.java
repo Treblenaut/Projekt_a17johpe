@@ -57,6 +57,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), item.getInfo(), Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(MainActivity.this, Details.class);
                 intent.putExtra("title", item.getName());
+                intent.putExtra("subtitle", item.getHeroName());
+                intent.putExtra("image", item.getImage());
+                intent.putExtra("team", item.getTeam());
+                intent.putExtra("first", item.getFirstAppearance());
+                intent.putExtra("actor", item.getActor());
+                intent.putExtra("home", item.getHomeLocation());
+                intent.putExtra("wiki", item.getWikipage());
                 startActivity(intent);
             }
         });
@@ -250,6 +257,11 @@ public class MainActivity extends AppCompatActivity {
                             intent.putExtra("title", item.getName());
                             intent.putExtra("subtitle", item.getHeroName());
                             intent.putExtra("image", item.getImage());
+                            intent.putExtra("team", item.getTeam());
+                            intent.putExtra("first", item.getFirstAppearance());
+                            intent.putExtra("actor", item.getActor());
+                            intent.putExtra("home", item.getHomeLocation());
+                            intent.putExtra("wiki", item.getWikipage());
                             startActivity(intent);
                         }
                     }));
