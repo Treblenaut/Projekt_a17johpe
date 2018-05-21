@@ -1,6 +1,7 @@
 package com.example.a17johpe.projekt_a17johpe;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -54,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(MarvelCharacter item) {
                 Toast.makeText(getApplicationContext(), item.getInfo(), Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(MainActivity.this, Details.class);
+                intent.putExtra("title", item.getName());
+                startActivity(intent);
             }
         });
 
@@ -94,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void rereadFromDatabase() {
-        characterData.clear();
+        //characterData.clear();
         SQLiteDatabase dbRead = dbHelper.getReadableDatabase();
 
         String[] projection = {
@@ -133,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
             MarvelCharacter m = new MarvelCharacter(mName, mTeam, mFirst, mHome, mHero, mActor, mWiki, mImage);
             characterData.add(m);
+            Log.d("olle1", m.getInfo());
         }
         cursor.close();
     }
@@ -242,6 +247,9 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onItemClick(MarvelCharacter item) {
                             Toast.makeText(getApplicationContext(), item.getInfo(), Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(MainActivity.this, Details.class);
+                            intent.putExtra("title", item.getName());
+                            startActivity(intent);
                         }
                     }));
                 }

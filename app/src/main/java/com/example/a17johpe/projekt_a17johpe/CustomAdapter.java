@@ -17,17 +17,12 @@ import java.util.List;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
     public List<MarvelCharacter> mDataset;
-    private OnItemClickListener mOnItemClickListener;
 
     public interface OnItemClickListener {
         void onItemClick(MarvelCharacter item);
     }
 
     private final OnItemClickListener listener;
-
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.mOnItemClickListener = onItemClickListener;
-    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mTextView;
@@ -64,21 +59,13 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         holder.mTextView.setText(mDataset.get(position).getName());
         holder.mTextView2.setText(mDataset.get(position).getHeroName());
         holder.mTextView3.setText(mDataset.get(position).getTeam());
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.onItemClick(mDataset.get(position));
             }
         });
-    }
-
-    public void add(MarvelCharacter m) {
-        mDataset.add(m);
-    }
-
-    public void clear () {
-        mDataset.clear();
-        //notifyItemChanged();
     }
 
     @Override
