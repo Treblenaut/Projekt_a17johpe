@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
 
         dbHelper = new MarvelReaderDbHelper(getApplicationContext());
-        rereadFromDatabase();
     }
 
     @Override
@@ -249,10 +248,13 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), item.getInfo(), Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(MainActivity.this, Details.class);
                             intent.putExtra("title", item.getName());
+                            intent.putExtra("subtitle", item.getHeroName());
+                            intent.putExtra("image", item.getImage());
                             startActivity(intent);
                         }
                     }));
                 }
+                rereadFromDatabase();
             } catch (JSONException e) {
                 e.printStackTrace();
             }

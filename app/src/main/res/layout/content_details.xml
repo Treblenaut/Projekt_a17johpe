@@ -8,6 +8,35 @@
     tools:context="com.example.a17johpe.projekt_a17johpe.Details"
     tools:showIn="@layout/activity_details">
 
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="2dp"
+        android:layout_margin="8dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_title"
+                android:textSize="24sp"
+                android:textColor="#000"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="24dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_subtitle"
+                android:textSize="14sp"
+                android:textColor="#000"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginBottom="24dp"/>
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
 
 </LinearLayout>
