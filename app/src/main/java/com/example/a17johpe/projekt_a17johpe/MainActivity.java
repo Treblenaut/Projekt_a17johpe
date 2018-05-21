@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private boolean teamSort = false;
+    private boolean nameSort = true;
+    private boolean chrisFilter = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,15 +70,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         mRecyclerView.setAdapter(mAdapter);
 
         dbHelper = new MarvelReaderDbHelper(getApplicationContext());
@@ -90,21 +84,38 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.mainmenu_about:
+                String str = "This app is for you, as a fan of the Marvel Cinematic Universe, who want to know about all of its characters.";
+                Snackbar.make(getCurrentFocus(), str, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                return true;
+            case R.id.mainmenu_chris:
+                chrisFilter = true;
+                teamSort = false;
+                rereadFromDatabase();
+                return true;
+            case R.id.mainmenu_team:
+                teamSort = true;
+                chrisFilter = false;
+                nameSort = false;
+                rereadFromDatabase();
+                return true;
+            case R.id.mainmenu_name:
+                teamSort = false;
+                chrisFilter = false;
+                nameSort = true;
+                rereadFromDatabase();
+                return true;
+            case R.id.mainmenu_groot:
+                Toast.makeText(getApplicationContext(), "I am Groot", Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void rereadFromDatabase() {
-        //characterData.clear();
+        characterData.clear();
         SQLiteDatabase dbRead = dbHelper.getReadableDatabase();
 
         String[] projection = {
@@ -119,12 +130,25 @@ public class MainActivity extends AppCompatActivity {
                 MarvelReaderContract.MarvelEntry.COLUMN_NAME_IMAGE
         };
 
-        String sortOrder = MarvelReaderContract.MarvelEntry.COLUMN_NAME_NAME + " ASC";
+        String selection = null;
+        if (chrisFilter) {
+            selection = MarvelReaderContract.MarvelEntry.COLUMN_NAME_ACTOR + " = 'Chris Evans' OR " +
+                    MarvelReaderContract.MarvelEntry.COLUMN_NAME_ACTOR + " = 'Chris Hemsworth' OR " +
+                    MarvelReaderContract.MarvelEntry.COLUMN_NAME_ACTOR + " = 'Chris Pratt'";
+        }
+        //String [] selectionArgs = { "Chris" };
+
+        String sortOrder =  MarvelReaderContract.MarvelEntry.COLUMN_NAME_NAME + " ASC";;
+        if (nameSort) {
+            sortOrder =  MarvelReaderContract.MarvelEntry.COLUMN_NAME_NAME + " ASC";
+        } else if (teamSort) {
+            sortOrder = MarvelReaderContract.MarvelEntry.COLUMN_NAME_TEAM + " ASC";
+        }
 
         Cursor cursor = dbRead.query(
                 MarvelReaderContract.MarvelEntry.TABLE_NAME,
                 projection,
-                null,
+                selection,
                 null,
                 null,
                 null,
@@ -146,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("olle1", m.getInfo());
         }
         cursor.close();
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     private class FetchData extends AsyncTask<Void,Void,String> {

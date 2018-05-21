@@ -2,9 +2,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.a17johpe.projekt_a17johpe.MainActivity">
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+    <item android:title="Sort by name" android:id="@+id/mainmenu_name" />
+    <item android:title="Sort by team" android:id="@+id/mainmenu_team" />
+    <item android:title="Filter by Chris" android:id="@+id/mainmenu_chris" />
+    <item android:title="I am Groot" android:id="@+id/mainmenu_groot" />
+    <item android:title="About" android:id="@+id/mainmenu_about" />
 </menu>
