@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new CustomAdapter(characterData, new CustomAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(MarvelCharacter item) {
-                Toast.makeText(getApplicationContext(), item.getInfo(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), item.getInfo(), Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(MainActivity.this, Details.class);
                 intent.putExtra("title", item.getName());
                 intent.putExtra("subtitle", item.getHeroName());
@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
                     mRecyclerView.setAdapter(new CustomAdapter(characterData, new CustomAdapter.OnItemClickListener() {
                         @Override
                         public void onItemClick(MarvelCharacter item) {
-                            Toast.makeText(getApplicationContext(), item.getInfo(), Toast.LENGTH_LONG).show();
+                            //Toast.makeText(getApplicationContext(), item.getInfo(), Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(MainActivity.this, Details.class);
                             intent.putExtra("title", item.getName());
                             intent.putExtra("subtitle", item.getHeroName());
